@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { LocalTime } from "@/components/LocalTime";
 import { MarkReachedOutButton } from "@/components/MarkReachedOutButton";
@@ -51,7 +52,13 @@ export default async function LeadsPage({
     }),
     href(tab, page),
   );
+
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
+  
+  // If page value exceeds the actual max available pages, guard to the last available page possible 
+  // by redirecting to it.
+  if (page > pages) redirect(href(tab, pages));
+  if (page < 1) redirect(href(tab, 1));
 
   return (
     <div className="space-y-6">
