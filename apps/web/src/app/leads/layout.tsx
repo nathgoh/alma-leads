@@ -1,3 +1,5 @@
+// Attorneys only: everything under /leads. Loads the signed-in attorney (401 → /login) and
+// renders the dashboard header. src/proxy.ts redirects cookie-less requests before this runs.
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";

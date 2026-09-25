@@ -29,12 +29,12 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function LeadDetailPage({ params }: { params: Promise<{ leadId: string }> }) {
+  const { leadId } = await params;
   const api = await serverApi();
-  const result = await api.GET("/api/v1/leads/{lead_id}", { params: { path: { lead_id: id } } });
+  const result = await api.GET("/api/v1/leads/{lead_id}", { params: { path: { lead_id: leadId } } });
   if (result.response.status === 404) notFound();
-  const lead = unwrap(result, `/leads/${id}`);
+  const lead = unwrap(result, `/leads/${leadId}`);
 
   return (
     <div className="space-y-6">

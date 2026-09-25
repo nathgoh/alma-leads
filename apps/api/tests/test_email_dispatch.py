@@ -1,3 +1,5 @@
+import asyncio
+
 from httpx import AsyncClient
 from sqlalchemy import select
 
@@ -48,3 +50,18 @@ async def test_rerun_only_resends_unsent_rows(client: AsyncClient, sender: FakeS
     assert len(logs) == 3
     assert all(log.status == EmailStatus.SENT for log in logs)
     assert len(sender.sent) == 3
+
+
+async def test_concurrent_dispatch_is_serialized_not_duplicated(
+    client: AsyncClient, sender: FakeSender
+) -> None:
+    # An at-least-once redelivery can run send_lead_emails twice at once. Without the per-lead
+    # advisory lock both calls see no rows, insert, and send — duplicating rows and emails.
+    lead_id = (await client.post("/api/v1/leads", data=lead_form(), files=resume_file())).json()["id"]
+
+    await asyncio.gather(*(send_lead_emails(lead_id, sender, SessionLocal) for _ in range(8)))
+
+    logs = await _logs()
+    keys = [(log.kind, log.recipient) for log in logs]
+    assert len(keys) == len(set(keys)) == 3  # no duplicate rows
+    assert len(sender.sent) == 3  # each recipient emailed exactly once

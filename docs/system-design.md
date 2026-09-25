@@ -137,8 +137,8 @@ alma-leads/
 │   └── web/                        # NextJS (App Router) service
 │       ├── src/
 │       │   ├── app/
-│       │   │   ├── (public)/        # `/` lead form (react-hook-form + Zod)
-│       │   │   ├── (internal)/      # `/leads`, `/leads/[id]` (auth-guarded)
+│       │   │   ├── page.tsx         # `/` lead form for prospects (react-hook-form + Zod)
+│       │   │   ├── leads/           # `/leads`, `/leads/[leadId]` for attorneys (layout.tsx: auth-guarded)
 │       │   │   └── login/
 │       │   ├── components/
 │       │   ├── lib/api/             # generated types + browser client (/api) + server client (cookie-forwarding)
@@ -790,16 +790,15 @@ Flow: transaction commits → response returns → background task runs → for 
 
 ## 12. Frontend Design (NextJS)
 
-**App Router, two route groups split by trust boundary:**
+**App Router, split by trust boundary — prospects at `/`, attorneys under `/leads`:**
 
 ```
 src/app/
-├── (public)/
-│   └── page.tsx          # "/" — lead form
-├── (internal)/
-│   ├── leads/
-│   │   ├── page.tsx      # list: state filter, pagination
-│   │   └── [id]/page.tsx # detail: all fields, resume download, transition button
+├── page.tsx              # "/" — lead form (prospects, public)
+├── leads/                # attorneys only
+│   ├── layout.tsx        # auth check + header
+│   ├── page.tsx          # list: state filter, pagination
+│   └── [leadId]/page.tsx # detail: all fields, resume download, transition button
 ├── login/page.tsx
 └── middleware.ts         # cookie present? else redirect to /login
 ```

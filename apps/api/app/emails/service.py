@@ -8,7 +8,7 @@ import asyncio
 import logging
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.config import settings
@@ -63,7 +63,7 @@ async def _deliver(
             return
 
 
-async def send_lead_emails(
+async def _dispatch(
     lead_id: str, sender: EmailSender, session_factory: async_sessionmaker[AsyncSession]
 ) -> None:
     async with session_factory() as session, session.begin():
@@ -91,3 +91,24 @@ async def send_lead_emails(
         row_ids = [r.id for r in rows]
 
     await asyncio.gather(*(_deliver(session_factory, sender, lead, row_id) for row_id in row_ids))
+
+
+async def send_lead_emails(
+    lead_id: str, sender: EmailSender, session_factory: async_sessionmaker[AsyncSession]
+) -> None:
+    """Serialize the whole dispatch per lead.
+
+    The row-existence check alone isn't idempotent under concurrency: two workers (a retried
+    BackgroundTask, an at-least-once queue redelivery) can both find no rows and both insert +
+    send, duplicating the `EmailLog` rows *and* the emails. A session-level advisory lock keyed
+    on the lead id makes concurrent callers run one after another, so the second sees `SENT`
+    rows and skips them. Session-level (not xact-scoped) because delivery happens outside the
+    row-creation transaction, after it has already committed.
+    """
+    key = func.hashtextextended(lead_id, 0)
+    async with session_factory() as lock_session:
+        await lock_session.execute(select(func.pg_advisory_lock(key)))
+        try:
+            await _dispatch(lead_id, sender, session_factory)
+        finally:
+            await lock_session.execute(select(func.pg_advisory_unlock(key)))

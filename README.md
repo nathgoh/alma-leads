@@ -3,7 +3,7 @@
 Public lead-intake form (name, email, resume) with confirmation + attorney notification emails, and an
 authenticated dashboard where attorneys review leads, download resumes, and mark leads as reached out.
 
-Design: [`../docs/system-design.md`](../docs/system-design.md). Implementation notes and deviations: [`NOTES.md`](NOTES.md).
+Design: [`docs/system-design.md`](docs/system-design.md). Implementation notes and deviations: [`NOTES.md`](NOTES.md).
 
 | Piece | Stack |
 |---|---|
@@ -72,8 +72,8 @@ apps/api/
   prisma/schema.prisma, prisma/migrations/          source of truth for the data model
   tests/                                            pytest
 apps/web/
-  src/app/(public)/page.tsx                         lead form  (/)
-  src/app/(internal)/leads/…                        dashboard  (/leads, /leads/[id])
+  src/app/page.tsx                                  prospects: lead + resume form  (/)
+  src/app/leads/…                                   attorneys: dashboard  (/leads, /leads/[leadId]); layout.tsx checks auth
   src/app/login/                                    sign in
   src/lib/api/{browser,server}.ts                   the two API clients (same-origin /api vs. cookie-forwarding)
   src/proxy.ts                                      redirect to /login when there's no session cookie

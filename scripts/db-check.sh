@@ -7,6 +7,13 @@ cd "$(dirname "$0")/../apps/api"   # npx only finds prisma.config.ts from this d
 : "${DATABASE_URL:?must be set}"
 : "${SHADOW_DATABASE_URL:?must be set}"
 
+# Prisma 7 ships as an npx package; give a pointed error instead of "npx: command not found"
+# on setups where Node exists but npm/npx shims don't (e.g. nvm without `corepack enable npm`).
+if ! command -v npx >/dev/null; then
+  echo "error: npx not found on PATH — install Node with npm (nodejs.org) or 'corepack enable npm'" >&2
+  exit 127
+fi
+
 npx prisma validate
 
 # (1) migration history ↔ schema.prisma (replayed in the shadow DB). Exit 2 = drift.

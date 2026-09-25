@@ -12,6 +12,7 @@
 
 | Design says | Implemented | Why |
 |---|---|---|
+| Route groups `(public)`, `(internal)`, segment `[id]` | No route groups: `app/page.tsx` (prospects) and `app/leads/` with its own `layout.tsx` (attorneys); `[leadId]` | Every attorney page already lives under `/leads`, so a plain folder with a layout does the job of the group, with the same URLs. `[leadId]` says what the param is (brackets are required for dynamic segments). |
 | `src/middleware.ts` | `src/proxy.ts` | Next.js 16 renamed middleware → proxy. Same matcher (`/leads/:path*`), same job. |
 | `minio/minio` image | `pgsty/minio` (pinned release) | Upstream no longer publishes `minio/minio` on Docker Hub; `pgsty/minio` is a maintained drop-in build of the same server. |
 | "Client IPs survive the proxy" via `--proxy-headers` | + `apps/web/server-entry.cjs` | Verified empirically: Next's `/api/*` rewrite forwards a **client-supplied** `X-Forwarded-For` untouched and never adds the real address. With uvicorn trusting the web hop, anyone could rotate a fake XFF and dodge the per-IP rate limit. The entrypoint overwrites XFF with the socket address before Next sees the request. Behind a load balancer that sets XFF, route `/api/*` at the LB instead. |
@@ -24,7 +25,6 @@
 | Retries "1s/5s/25s" | 3 attempts total, sleeping 1s then 5s (base × 5ⁿ) | 3 attempts need two waits; `EMAIL_MAX_ATTEMPTS` / `EMAIL_RETRY_BASE_SECONDS` make both tunable. |
 | — | `GET /leads/{id}` includes the `EmailLog` rows | The design's reason for `EmailLog` is answering "did the emails send?"; the detail page shows it. |
 | — | JSON is camelCase (`firstName`, `pageSize`, …), timestamps are UTC with `Z` | Matches the Prisma field names; columns are `TIMESTAMP(3)` without zone, so the API marks them UTC explicitly. |
-| `docs/` and CI inside `alma-leads/` | `docs/` and `.github/workflows/ci.yml` at the git root | That's where the repository root is; CI jobs `cd alma-leads`. |
 
 ## Small additions
 

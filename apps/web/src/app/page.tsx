@@ -1,3 +1,4 @@
+// Prospects (public, no auth): submit contact details and a resume.
 import { LeadForm } from "@/components/LeadForm";
 
 export default function HomePage() {
@@ -13,6 +14,9 @@ export default function HomePage() {
       </div>
       <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
         <LeadForm />
+      </div>
+      <div>
+        Not a client? Login as an attonery.
       </div>
     </main>
   );
