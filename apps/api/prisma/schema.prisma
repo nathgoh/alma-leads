@@ -1,0 +1,75 @@
+// Single source of truth for the data model.
+// No url here (Prisma 7: it lives in prisma.config.ts) and no generator block:
+// Prisma only authors DDL/migrations; SQLAlchemy (app/db/models.py) owns runtime queries.
+datasource db {
+  provider = "postgresql"
+}
+
+model Lead {
+  id             String     @id @default(uuid())
+  firstName      String
+  lastName       String
+  email          String
+  state          LeadState  @default(PENDING)
+  resumeKey      String // S3 object key, never a public URL
+  resumeName     String // original filename for display
+  resumeSize     Int
+  resumeMime     String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  reachedOutAt   DateTime?
+  reachedOutBy   String? // User.id who transitioned the lead
+  reachedOutUser User?      @relation("ReachedOutBy", fields: [reachedOutBy], references: [id])
+  emails         EmailLog[]
+
+  @@index([state, createdAt])
+  @@index([createdAt])
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(ATTORNEY)
+  createdAt    DateTime @default(now())
+  leadsReached Lead[]   @relation("ReachedOutBy")
+}
+
+model EmailLog {
+  id         String      @id @default(uuid())
+  leadId     String
+  lead       Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  kind       EmailKind
+  recipient  String
+  status     EmailStatus @default(PENDING)
+  providerId String? // provider message id (Resend id, SMTP Message-ID)
+  error      String?
+  attempts   Int         @default(0)
+  sentAt     DateTime?
+  createdAt  DateTime    @default(now())
+
+  @@index([leadId])
+  @@index([status])
+}
+
+enum LeadState {
+  PENDING
+  REACHED_OUT
+}
+
+enum UserRole {
+  ATTORNEY
+  ADMIN
+}
+
+enum EmailKind {
+  PROSPECT_CONFIRMATION
+  ATTORNEY_NOTIFICATION
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}

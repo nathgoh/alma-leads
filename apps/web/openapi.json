@@ -1,0 +1,830 @@
+{
+  "components": {
+    "schemas": {
+      "Body_create_lead_api_v1_leads_post": {
+        "properties": {
+          "email": {
+            "maxLength": 254,
+            "title": "Email",
+            "type": "string"
+          },
+          "firstName": {
+            "maxLength": 100,
+            "title": "Firstname",
+            "type": "string"
+          },
+          "lastName": {
+            "maxLength": 100,
+            "title": "Lastname",
+            "type": "string"
+          },
+          "resume": {
+            "contentMediaType": "application/octet-stream",
+            "description": "PDF, DOC, or DOCX",
+            "title": "Resume",
+            "type": "string"
+          },
+          "website": {
+            "default": "",
+            "description": "Honeypot; leave empty",
+            "title": "Website",
+            "type": "string"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "resume"
+        ],
+        "title": "Body_create_lead_api_v1_leads_post",
+        "type": "object"
+      },
+      "EmailKind": {
+        "enum": [
+          "PROSPECT_CONFIRMATION",
+          "ATTORNEY_NOTIFICATION"
+        ],
+        "title": "EmailKind",
+        "type": "string"
+      },
+      "EmailLogOut": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/EmailKind"
+          },
+          "recipient": {
+            "title": "Recipient",
+            "type": "string"
+          },
+          "sentAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sentat"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EmailStatus"
+          }
+        },
+        "required": [
+          "kind",
+          "recipient",
+          "status",
+          "attempts",
+          "error",
+          "sentAt"
+        ],
+        "title": "EmailLogOut",
+        "type": "object"
+      },
+      "EmailStatus": {
+        "enum": [
+          "PENDING",
+          "SENT",
+          "FAILED"
+        ],
+        "title": "EmailStatus",
+        "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LeadCreated": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "default": "Thanks! Your information has been received.",
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "LeadCreated",
+        "type": "object"
+      },
+      "LeadDetail": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "emails": {
+            "items": {
+              "$ref": "#/components/schemas/EmailLogOut"
+            },
+            "title": "Emails",
+            "type": "array"
+          },
+          "firstName": {
+            "title": "Firstname",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lastName": {
+            "title": "Lastname",
+            "type": "string"
+          },
+          "reachedOutAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reachedoutat"
+          },
+          "reachedOutBy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReachedOutBy"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resumeMime": {
+            "title": "Resumemime",
+            "type": "string"
+          },
+          "resumeName": {
+            "title": "Resumename",
+            "type": "string"
+          },
+          "resumeSize": {
+            "title": "Resumesize",
+            "type": "integer"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LeadState"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "title": "Updatedat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "state",
+          "resumeName",
+          "createdAt",
+          "reachedOutAt",
+          "resumeSize",
+          "resumeMime",
+          "updatedAt",
+          "emails"
+        ],
+        "title": "LeadDetail",
+        "type": "object"
+      },
+      "LeadPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LeadSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "pageSize": {
+            "title": "Pagesize",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ],
+        "title": "LeadPage",
+        "type": "object"
+      },
+      "LeadState": {
+        "enum": [
+          "PENDING",
+          "REACHED_OUT"
+        ],
+        "title": "LeadState",
+        "type": "string"
+      },
+      "LeadSummary": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "title": "Createdat",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "firstName": {
+            "title": "Firstname",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lastName": {
+            "title": "Lastname",
+            "type": "string"
+          },
+          "reachedOutAt": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reachedoutat"
+          },
+          "resumeName": {
+            "title": "Resumename",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LeadState"
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email",
+          "state",
+          "resumeName",
+          "createdAt",
+          "reachedOutAt"
+        ],
+        "title": "LeadSummary",
+        "type": "object"
+      },
+      "LeadUpdate": {
+        "properties": {
+          "state": {
+            "const": "REACHED_OUT",
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "LeadUpdate",
+        "type": "object"
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "ReachedOutBy": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "title": "ReachedOutBy",
+        "type": "object"
+      },
+      "ResumeDownload": {
+        "properties": {
+          "expiresIn": {
+            "title": "Expiresin",
+            "type": "integer"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "filename",
+          "expiresIn"
+        ],
+        "title": "ResumeDownload",
+        "type": "object"
+      },
+      "UserOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role"
+        ],
+        "title": "UserOut",
+        "type": "object"
+      },
+      "UserRole": {
+        "enum": [
+          "ATTORNEY",
+          "ADMIN"
+        ],
+        "title": "UserRole",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Alma Leads API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logout_api_v1_auth_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Logout",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "me_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Me",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/leads": {
+      "get": {
+        "operationId": "list_leads_api_v1_leads_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Pagesize",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LeadState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "newest",
+              "enum": [
+                "newest",
+                "oldest"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Leads",
+        "tags": [
+          "leads (internal)"
+        ]
+      },
+      "post": {
+        "description": "Public lead submission (multipart). Returns only an id \u2014 nothing else is echoed back.",
+        "operationId": "create_lead_api_v1_leads_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_create_lead_api_v1_leads_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Lead",
+        "tags": [
+          "leads (public)"
+        ]
+      }
+    },
+    "/api/v1/leads/{lead_id}": {
+      "get": {
+        "operationId": "get_lead_api_v1_leads__lead_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lead_id",
+            "required": true,
+            "schema": {
+              "title": "Lead Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Lead",
+        "tags": [
+          "leads (internal)"
+        ]
+      },
+      "patch": {
+        "description": "State transition. 409 (not a silent no-op) if the current state has no edge to the target.",
+        "operationId": "update_lead_api_v1_leads__lead_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lead_id",
+            "required": true,
+            "schema": {
+              "title": "Lead Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Lead",
+        "tags": [
+          "leads (internal)"
+        ]
+      }
+    },
+    "/api/v1/leads/{lead_id}/resume": {
+      "get": {
+        "description": "Mint a short-lived presigned URL. The store serves the bytes; the API only authorizes.",
+        "operationId": "get_resume_api_v1_leads__lead_id__resume_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lead_id",
+            "required": true,
+            "schema": {
+              "title": "Lead Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeDownload"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Resume",
+        "tags": [
+          "leads (internal)"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+Hi {{ lead.first_name }},
+
+We received your information and resume. Thank you for reaching out.
+
+What happens next: an attorney will review your submission and contact you at this email address, usually within a few business days.
+
+You don't need to do anything else right now.
+
+— Alma

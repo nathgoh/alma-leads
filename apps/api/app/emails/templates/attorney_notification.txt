@@ -1,0 +1,8 @@
+A new lead was submitted.
+
+Name:      {{ lead.first_name }} {{ lead.last_name }}
+Email:     {{ lead.email }}
+Resume:    {{ lead.resume_name }} ({{ resume_size_kb }} KB)
+Submitted: {{ submitted_at }}
+
+Open lead: {{ lead_url }}
