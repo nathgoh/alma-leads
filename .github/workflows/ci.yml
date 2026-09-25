@@ -5,9 +5,7 @@ on:
     branches: [main]
   pull_request:
 
-defaults:
-  run:
-    working-directory: alma-leads
+
 
 jobs:
   api:
@@ -24,24 +22,24 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmagic1
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 #v10.1.0
         with:
           version: "0.12.19"
           enable-cache: true
-          cache-dependency-glob: alma-leads/apps/api/uv.lock
+          cache-dependency-glob: apps/api/uv.lock
       - run: uv sync --locked
-        working-directory: alma-leads/apps/api
+        working-directory: apps/api
       - run: uv run ruff check . && uv run ruff format --check . && uv run mypy app
-        working-directory: alma-leads/apps/api
+        working-directory: apps/api
       # Includes the OpenAPI contract test: fails if the web client wasn't regenerated.
       - run: uv run pytest
-        working-directory: alma-leads/apps/api
+        working-directory: apps/api
 
   web:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: alma-leads/apps/web
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -51,7 +49,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: alma-leads/apps/web/pnpm-lock.yaml
+          cache-dependency-path: apps/web/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - name: Generated client is up to date with openapi.json
         run: pnpm generate:api && git diff --exit-code src/lib/api/schema.d.ts
@@ -78,17 +76,18 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: alma-leads/apps/api/package-lock.json
-      - uses: astral-sh/setup-uv@v10
+          cache-dependency-path: apps/api/package-lock.json
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 #v10.1.0
         with:
           version: "0.12.19"
           enable-cache: true
-          cache-dependency-glob: alma-leads/apps/api/uv.lock
+          cache-dependency-glob: apps/api/uv.lock
       - run: npm ci
-        working-directory: alma-leads/apps/api
+        working-directory: apps/api
       - run: uv sync --locked
-        working-directory: alma-leads/apps/api
+        working-directory: apps/api
       - run: >-
           psql postgresql://postgres:postgres@localhost:5432/postgres
           -c 'CREATE DATABASE alma_ci' -c 'CREATE DATABASE alma_ci_shadow'
       - run: scripts/db-check.sh
+        working-directory: .
