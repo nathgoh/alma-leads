@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { LoginForm } from "@/components/LoginForm";
 
@@ -14,6 +15,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       </div>
       <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
         <LoginForm next={next} />
+      </div>
+      <div className="mt-2 mb-8 space-y-2">
+        <p className="text-sm font-light tracking-tight">
+          Not an attorney?{" "}
+          <Link href="/" className="font-medium text-zinc-900 underline underline-offset-4 hover:text-zinc-600">
+            Submit your information for an assessment
+          </Link>
+          .
+        </p>
       </div>
     </main>
   );
